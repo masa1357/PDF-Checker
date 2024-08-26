@@ -25,7 +25,7 @@ def highlight_issues(pdf_path, issues):
     doc.close()
     return new_filename
 
-def check_indentation_and_highlight(file, expected_indentation=72):
+def check(file, expected_indentation=72):
     issues = {}
     with pdfplumber.open(file) as pdf:
         for i, page in enumerate(pdf.pages):
@@ -45,7 +45,7 @@ def main(path):
     pdf_files = search_files(path, ".pdf")
     for file in pdf_files:
         print(f"Processing File: {file}")
-        issues = check_indentation_and_highlight(file)
+        issues = check(file)
         if issues:
             highlighted_pdf = highlight_issues(file, issues)
             print(f"Highlighted PDF saved as: {highlighted_pdf}")
