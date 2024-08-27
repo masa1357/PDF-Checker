@@ -17,7 +17,7 @@ import requests
 def check_typo_with_direct_url(sentence):
     url = "https://api.a3rt.recruit.co.jp/proofreading/v2/typo"
     params = {
-        "apikey": "ZZBP6flVhk2F0nMAwdtobVysrnu6xJI6",
+        "apikey": "",
         "sentence": sentence,
     }
     response = requests.get(url, params=params)
@@ -40,7 +40,7 @@ def check_typo_with_direct_url(sentence):
 
 
 def output_report(doc, all_positions, pdf_path, log):
-    
+
     total_pages = len(doc)  # PDFの総ページ数を取得
     if all_positions is not None:
         print(f"Found {len(all_positions)} issues.")
@@ -53,7 +53,7 @@ def output_report(doc, all_positions, pdf_path, log):
             rect = fitz.Rect(pos['rect'])
             highlight = page.add_highlight_annot(rect)
             highlight.update()
-        
+
     new_filename = pathlib.Path(pdf_path).stem + "_highlighted.pdf"
     doc.save(new_filename)
     doc.close()
@@ -65,20 +65,20 @@ def output_log(log):
     filename = f"sammary_report.pdf"
     doc = SimpleDocTemplate(filename, pagesize=letter)
     styles = getSampleStyleSheet()
-    
+
     # PDFに追加する要素リスト
     elements = []
-    
+
     # タイトルを追加
     title = f"Log Report - {date}"
     elements.append(Paragraph(title, styles['Title']))
     elements.append(Spacer(1, 12))
-    
+
     # ログメッセージを追加
     for message in log:
         elements.append(Paragraph(message, styles['BodyText']))
         elements.append(Spacer(1, 12))
-    
+
     # PDFを生成
     doc.build(elements)
 
@@ -104,7 +104,7 @@ def find_punctuation_positions(characters:str, log, doc):
             })
             logtext = f"Page {positions['page']}: The punctuation mark '{positions['character']}' is incorrect."
             log.append(logtext)
-            
+
 
     return positions, log
 
@@ -118,7 +118,7 @@ def find_all_punctuation_positions(check_marks_type:MARK_TYPES, log, doc):
         highlight_punctuation_marks = ["、", "。"]
     else:
         raise ValueError("Invalid MARK_TYPES")
-    
+
     all_positions = []
 
     for mark in highlight_punctuation_marks:
@@ -138,22 +138,22 @@ def check_typo(doc, log):
         # 誤字チェック（API）何文字目に誤字があるかを返す
         result = check_typo_with_direct_url(text)
         alerts = result.get('alerts')
-        
+
         if alerts is not None:
             for alert in alerts:
                 typopoint = alert.get('pos')
                 characters = alert.get('word')
-            
+
                 # その文字がpdfのどこの位置にあるかを求める
                 rect = page.search_for(characters)
-                
+
                 typo.append({
                         "page": page,
                         "character": characters,
                         "rect": rect
                     })
         log.append(f"Page {page}: The character '{characters}' is incorrect.")
-        
+
     return typo, log
 
 def main(f_path:str,check_marks_type:MARK_TYPES):

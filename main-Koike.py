@@ -25,7 +25,7 @@ class MARK_TYPES(Enum):
 def check_typo_with_direct_url(sentence):
     url = "https://api.a3rt.recruit.co.jp/proofreading/v2/typo"
     params = {
-        "apikey": "ZZBP6flVhk2F0nMAwdtobVysrnu6xJI6",
+        
         "sentence": sentence,
     }
     response = requests.get(url, params=params)
@@ -179,7 +179,7 @@ def find_all_punctuation_positions(check_marks_type: MARK_TYPES, log, doc):
 
     for mark in highlight_punctuation_marks:
         positions, log = find_punctuation_positions(mark, log, doc)
-        all_positions.extend(positions)
+        # all_positions.extend(positions)
 
     return all_positions, log
 
@@ -205,6 +205,6 @@ if __name__ == "__main__":
     )
     tk.Tk().withdraw()
     f_path = filedialog.askopenfilename()
-    check_marks_type = MARK_TYPES.JA_MARKS  # チェックしたいマークの種類を指定
+    check_marks_type = MARK_TYPES.EN_MARKS  # チェックしたいマークの種類を指定
 
     main(f_path, check_marks_type)
